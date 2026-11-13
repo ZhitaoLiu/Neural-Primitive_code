@@ -1,0 +1,83 @@
+<launch>
+    <!-- size of map -->
+    <arg name="map_size_x" value="50.0" />
+    <arg name="map_size_y" value="20.0" />
+    <arg name="map_size_z" value="10.0" />
+
+    <!-- init pos -->
+    <arg name="init_x" value="-32.0" />
+    <arg name="init_y" value="0.0" />
+    <arg name="init_z" value="3.0" />
+
+    <!-- goal waypoint -->
+    <!-- for flight type 1: target height -->
+    <arg name="target_z" value="3.0"/>
+
+    <!-- for flight type 2: single or multi-waypoints -->
+    <rosparam param="/waypoints/x">[32.0]</rosparam>
+    <rosparam param="/waypoints/y">[0.0]</rosparam>
+    <rosparam param="/waypoints/z">[3.0]</rosparam>
+
+    <!-- 1 (MANUAL_TARGET): use 2D Nav Goal to select single-point goal  -->
+    <!-- 2 (PRESET_TARGET): use preset waypoints  -->
+    <arg name="flight_type" value="1" />
+    <arg name="thresh_replan" value="0.5" />
+    <arg name="thresh_no_replan" value="1.0" />
+
+    <!-- obstacle parameters -->
+    <arg name="obs_num" value="120" /> <!-- total number of obstacles = obs_num + 0.25*obs_num -->
+    <arg name="map_resolution" value=" 0.1" />
+    <arg name="min_dist" value="2.0" />
+
+    <arg name="odom_topic" value="/visual_slam/odom" />
+    <arg name="sensing_horizon" value="6.0" />
+
+    <arg name="model_select_file" value="$(find plan_manage)/launch/model.yaml" />
+
+    <include file="$(find plan_manage)/launch/advanced_param.xml">
+        <arg name="map_size_x_" value="$(arg map_size_x)" />
+        <arg name="map_size_y_" value="$(arg map_size_y)" />
+        <arg name="map_size_z_" value="$(arg map_size_z)" />
+        <arg name="odometry_topic" value="$(arg odom_topic)" />
+        <arg name="depth_topic" value="/pcl_render_node/depth" />
+        <arg name="cloud_topic" value="/pcl_render_node/cloud" />
+        <arg name="sensing_horizon" value="$(arg sensing_horizon)" />
+        <arg name="flight_type" value="$(arg flight_type)" />
+        <arg name="thresh_replan" value="$(arg thresh_replan)" />
+        <arg name="thresh_no_replan" value="$(arg thresh_no_replan)" />
+        <arg name="target_z" value="$(arg target_z)" />
+        <arg name="model_select_file" value="$(arg model_select_file)" />
+    </include>
+
+    <!-- trajectory server -->
+    <node pkg="plan_manage" name="traj_server" type="traj_server" output="screen">
+        <remap from="/position_cmd" to="planning/pos_cmd" />
+        <remap from="/odom_world" to="$(arg odom_topic)" />
+        <param name="traj_server/time_forward" value="0.1" type="double" />
+        <param name="traj_server/max_acc"       value="10.0" type="double" />
+    </node>
+
+    <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
+        <remap from="~goal" to="/move_base_simple/goal" />
+        <param name="waypoint_type" value="manual-lonely-waypoint" />
+    </node>
+
+    <!-- use simulator -->
+    <include file="$(find plan_manage)/launch/simulator.xml">
+        <arg name="init_x" value="$(arg init_x)" />
+        <arg name="init_y" value="$(arg init_y)" />
+        <arg name="init_z" value="$(arg init_z)" />
+        <arg name="map_size_x_" value="$(arg map_size_x)" />
+        <arg name="map_size_y_" value="$(arg map_size_y)" />
+        <arg name="map_size_z_" value="$(arg map_size_z)" />
+        <arg name="obs_num" value="$(arg obs_num)" />
+        <arg name="min_dist" value="$(arg min_dist)" />
+        <arg name="map_resolution" value="$(arg map_resolution)" />
+        <arg name="odometry_topic" value="$(arg odom_topic)" />
+        <arg name="sensing_horizon" value="$(arg sensing_horizon)" />
+    </include>
+
+    <!-- visualization -->
+    <node name="rviz_plot" pkg="rviz" type="rviz" args="-d $(find plan_manage)/launch/rvizView.rviz" required="true" />
+
+</launch>

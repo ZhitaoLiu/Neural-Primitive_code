@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+
+    <!-- for traj_server and simulator -->
+    <arg name="odom_topic" default="/visual_slam/odom" />
+
+
+    <!-- data_set_gen iteration -->
+    <arg name="max_map_iterations_simMap" value="10000" />
+    <arg name="max_scenarios_per_simMap" value="100" />
+    <arg name="obs_num_min" value="40" />
+    <arg name="obs_num_max" value="160" />
+    <arg name="vel_max" value="10.0" />
+    <arg name="acc_max" value="12.0" />
+    <arg name="max_valid_data" value="1000000" />
+    <arg name="max_threads" value="24" />
+    <arg name="thresh_no_replan" value="0.5" />
+    <arg name="replan_thresh" value="0.2" />
+    <arg name="enable_parallel" value="true" /> <!-- set "enable_parallel" to "true" for parallel computation. -->
+
+
+    <arg name="noise_std_pos" value="0.0" />
+    <arg name="noise_std_vel" value="0.0" />
+    <arg name="noise_std_acc" value="0.0" />
+    <arg name="noise_std_yaw" value="0.0" />
+
+    <!-- Map generation -->
+    <!-- simulated random map parameters -->
+    <arg name="map_size_x" value="50.0" />
+    <arg name="map_size_y" value="20.0" />
+    <arg name="map_size_z" value="10.0" />
+    <arg name="map/resolution" value="0.1" />
+    <arg name="min_dist" value="2.0" />
+    <arg name="publish_rate" value="10" />
+
+    <!-- Point cloud processor -->
+    <arg name="sensing_horizon" value="6.0" />
+    <arg name="pcd_range_limit" value="6.0" />
+    <arg name="pcd_vertical_deg" value="60.0" />
+    <arg name="pcd_horizontal_deg" value="90.0" />
+    <arg name="sampleSize" value="1024" />
+
+    <!-- Lib generation -->
+    <arg name="r" default="5" />
+    <arg name="thetaMin_pf" default="-30" />
+    <arg name="thetaMax_pf" default="30" />
+    <arg name="psiMin_pf" default="-45" />
+    <arg name="psiMax_pf" default="45" />
+    <arg name="step_theta_pf" default="10" />
+    <arg name="step_psi_pf" default="$(arg step_theta_pf)" />
+    <arg name="avgV" default="2.5" />
+    <arg name="end_vel" default="[0.0, 0.0, 0.0]" />
+    <arg name="end_acc" default="[0.0, 0.0, 0.0]" />
+
+    <!-- qp_solver params -->
+    <arg name="MaxVelBox" default="10.0" />
+    <arg name="MaxAccBox" default="12.0" />
+    <arg name="OptOrder" default="3" />
+    <arg name="Tolerance" default="1.0e-4" />
+    <arg name="ConstRes" default="20" />
+
+    <!-- voxel space -->
+    <arg name="box_x" default="6.0" />
+    <arg name="box_y" default="6.0" />
+    <arg name="box_z" default="6.0" />
+    <arg name="drone_radius" default="0.2" />
+    <arg name="voxelSize" default="0.1" />
+
+    <node pkg="data_set_gen" type="data_set_gen_node" name="data_set_gen_node" output="screen">
+        <remap from="/odom_world" to="$(arg odom_topic)" />
+        <param name="thresh_no_replan" value="$(arg thresh_no_replan)" />
+
+        <!-- data_set_gen iteration -->
+        <param name="max_map_iterations_simMap" value="$(arg max_map_iterations_simMap)" />
+        <param name="max_scenarios_per_simMap" value="$(arg max_scenarios_per_simMap)" />
+        <param name="obs_num_min" value="$(arg obs_num_min)" />
+        <param name="obs_num_max" value="$(arg obs_num_max)" />
+        <param name="vel_max" value="$(arg vel_max)" />
+        <param name="acc_max" value="$(arg acc_max)" />
+        <param name="max_valid_data" value="$(arg max_valid_data)" />
+        <param name="max_threads" value="$(arg max_threads)" />
+        <param name="enable_parallel" value="$(arg enable_parallel)" />
+        <param name="thresh_no_replan" value="$(arg thresh_no_replan)" />
+        <param name="replan_thresh" value="$(arg replan_thresh)" />
+
+        <param name="noise_std_pos" value="$(arg noise_std_pos)" />
+        <param name="noise_std_vel" value="$(arg noise_std_vel)" />
+        <param name="noise_std_acc" value="$(arg noise_std_acc)" />
+        <param name="noise_std_yaw" value="$(arg noise_std_yaw)" />
+
+        <!-- Map generation -->
+        <!-- simulated random map parameters -->
+        <param name="map/x_size" value="$(arg map_size_x)" />
+        <param name="map/y_size" value="$(arg map_size_y)" />
+        <param name="map/z_size" value="$(arg map_size_z)" />
+        <param name="map/resolution" value="$(arg map/resolution)" />
+
+        <param name="ObstacleShape/lower_rad" value="0.5" />
+        <param name="ObstacleShape/upper_rad" value="0.7" />
+        <param name="ObstacleShape/lower_hei" value="2.0" />
+        <param name="ObstacleShape/upper_hei" value="10.0" />
+
+        <param name="ObstacleShape/radius_l" value="0.3" />
+        <param name="ObstacleShape/radius_h" value="0.7" />
+        <param name="ObstacleShape/z_l" value="1" />
+        <param name="ObstacleShape/z_h" value="5" />
+        <param name="ObstacleShape/theta" value="0.5" />
+
+        <param name="min_distance" value="$(arg min_dist)" />
+        <param name="publish_rate" value="$(arg publish_rate)" />
+
+        <!-- Point cloud processor -->
+        <param name="sensing_horizon" value="$(arg sensing_horizon)" />
+        <param name="manager/pcd_range_limit" value="$(arg pcd_range_limit)" />
+        <param name="manager/pcd_vertical_deg" value="$(arg pcd_vertical_deg)" />
+        <param name="manager/pcd_horizontal_deg" value="$(arg pcd_horizontal_deg)" />
+
+        <!-- Lib generation -->
+        <param name="r" value="$(arg r)" />
+        <param name="thetaMin_pf" value="$(arg thetaMin_pf)" />
+        <param name="thetaMax_pf" value="$(arg thetaMax_pf)" />
+        <param name="psiMin_pf" value="$(arg psiMin_pf)" />
+        <param name="psiMax_pf" value="$(arg psiMax_pf)" />
+        <param name="step_theta_pf" value="$(arg step_theta_pf)" />
+        <param name="step_psi_pf" value="$(arg step_psi_pf)" />
+
+        <param name="avgV" value="$(arg avgV)" />
+        <rosparam param="end_vel" subst_value="true">$(arg end_vel)</rosparam>
+        <rosparam param="end_acc" subst_value="true">$(arg end_acc)</rosparam>
+
+        <!-- voxel space -->
+        <param name="box_x" value="$(arg box_x)" />
+        <param name="box_y" value="$(arg box_y)" />
+        <param name="box_z" value="$(arg box_z)" />
+        <param name="drone_radius" value="$(arg drone_radius)" />
+        <param name="voxelSize" value="$(arg voxelSize)" />
+
+        <!-- qp_solver params -->
+        <param name="MaxVelBox" value="$(arg MaxVelBox)" />
+        <param name="MaxAccBox" value="$(arg MaxAccBox)" />
+        <param name="OptOrder" value="$(arg OptOrder)" type="int" />
+        <param name="Tolerance" value="$(arg Tolerance)" />
+        <param name="ConstRes" value="$(arg ConstRes)" />
+
+        <!-- qp_primitive_planner -->
+        <param name="manager/depthCloudStackNum" value="1" />
+        <param name="manager/boxX" value="$(arg box_x)" />
+        <param name="manager/boxY" value="$(arg box_y)" />
+        <param name="manager/boxZ" value="$(arg box_z)" />
+        <param name="manager/voxelSize" value="$(arg voxelSize)" />
+        <param name="manager/sampleSize" value="$(arg sampleSize)" />
+        <param name="manager/map_size_x" value="$(arg map_size_x)" />
+        <param name="manager/map_size_y" value="$(arg map_size_y)" />
+        <param name="manager/map_size_z" value="$(arg map_size_z)" />
+
+
+    </node>
+
+
+    <!-- visualization -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find data_set_gen)/launch/default.rviz" unless="$(arg enable_parallel)" />
+
+</launch>

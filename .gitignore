@@ -1,0 +1,30 @@
+# ROS / Catkin generated files
+build/
+devel/
+install/
+logs/
+.catkin_tools/
+
+# Python bytecode and virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editor settings and temporary files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Operating system metadata
+.DS_Store
+Thumbs.db
+
+# Local environment variables (keep the example template)
+.env
+.env.*
+!.env.example
+
+# Model weights, meshes, and project configuration files are intentionally kept.
