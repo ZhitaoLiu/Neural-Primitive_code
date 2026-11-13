@@ -9,6 +9,9 @@
 
 **1. Download the code**
 
+```bash 
+git clone https://github.com/ZhitaoLiu/Neural-Primitive_code.git
+```
 
 
 **2. Configure LibTorch**
