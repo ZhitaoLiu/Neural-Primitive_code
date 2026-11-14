@@ -113,7 +113,7 @@ cd src/data_set_gen
 catkin_make
 ```
 
-**2. Run the dataset collection code**
+**3. Run the dataset collection code**
 
 ```bash
 source devel/setup.bash
